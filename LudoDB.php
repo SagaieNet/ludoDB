@@ -201,8 +201,71 @@ class LudoDB
             $obj->configParser()->getIdField() => NULL
         );
 
-        $this->mysql_insert($table, $data);
+        if (self::$mysqli) {
+            $this->mysqli_insert($obj, $table, $data);
+        } else {
+            $this->mysql_insert($table, $data);
+        }
 
+    }
+
+    private function mysqli_insert(LudoDBTable $obj, $table, $data)
+    {
+        if ($stmt = $this->getPreparedStatement($obj, $table, $data)) {
+            foreach ($data as $col => $value) {
+                $stmt['params'][$col] = mysql_real_escape_string(stripslashes($value));
+            }
+            $stmt['stmt']->execute();
+        } else {
+            $this->mysql_insert($table, $data);
+        }
+    }
+
+    private function bindParameters(&$statement, &$params)
+    {
+        $args = array();
+        $args[] = implode('', array_values($params));
+
+        foreach ($params as $paramName => $paramType) {
+            $args[] = & $params[$paramName];
+            $params[$paramName] = null;
+        }
+
+        call_user_func_array(array(&$statement, 'bind_param'), $args);
+    }
+
+    /**
+     * @param $table
+     * @param $data
+     * @return mysqli_stmt|null
+     * @throws Exception
+     */
+    private static $statements = array();
+
+    private function getPreparedStatement(LudoDBTable $obj, $table, $data)
+    {
+        $columns = array_keys($data);
+        $key = implode("", array_merge(array($table), $columns));
+        if (!isset(self::$statements[$key])) {
+            $sql = "insert into " . $table . "(" . implode(",", $columns) . ")values(";
+            for ($i = 0, $count = count($columns); $i < $count; $i++) {
+                if ($i) $sql .= ",";
+                $sql .= "?";
+            }
+            $sql .= ")";
+            if ($stmt = self::$conn->prepare($sql)) {
+                $params = $obj->configParser()->getTypesForPreparedSQL($columns);
+                $this->bindParameters($stmt, $params);
+
+                self::$statements[$key] = array(
+                    'stmt' => $stmt,
+                    'params' => &$params
+                );
+            } else {
+                throw new Exception(sprintf("Prepared Statement Error: %s\n", self::$conn->error));
+            }
+        }
+        return self::$statements[$key];
     }
 
     private function mysql_insert($table, $data)
