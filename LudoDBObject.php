@@ -15,7 +15,7 @@ class LudoDBObject
     protected $JSONConfig = false;
     private $JSONRead = false;
     private $sql_handler;
-
+    public $configParser;
 
     public function __construct()
     {
@@ -23,6 +23,7 @@ class LudoDBObject
         if (func_num_args() > 0) {
             $this->constructorValues = $this->getValidConstructorValues(func_get_args());
         }
+        if(!isset($this->configParser))$this->configParser = $this->getConfigParser();
         $this->onConstruct();
     }
 
@@ -91,7 +92,7 @@ class LudoDBObject
     /**
      * @return LudoDBConfigParser
      */
-    public function configParser()
+    public function getConfigParser()
     {
         $key = $this->getConfigParserKey();
         if (!isset(self::$configParsers[$key])) {

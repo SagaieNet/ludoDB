@@ -20,7 +20,7 @@ class ConfigParserTestJSON extends TestBase
         $client = new Client();
 
         // when
-        $table = $client->configParser()->getTableName();
+        $table = $client->configParser->getTableName();
 
         // then
         $this->assertEquals("Client", $table);

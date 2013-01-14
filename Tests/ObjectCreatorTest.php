@@ -47,9 +47,9 @@ class ObjectCreatorTest extends TestBase
         $pump = new Brand();
 
         // then
-        $this->assertTrue($pump->configParser()->canBePopulatedBy('id'));
-        $this->assertFalse($pump->configParser()->canBePopulatedBy('description'));
-        $this->assertTrue($pump->configParser()->canBePopulatedBy('category'));
+        $this->assertTrue($pump->configParser->canBePopulatedBy('id'));
+        $this->assertFalse($pump->configParser->canBePopulatedBy('description'));
+        $this->assertTrue($pump->configParser->canBePopulatedBy('category'));
     }
 
     /**

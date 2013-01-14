@@ -26,7 +26,7 @@ class ColumnAliasTest extends TestBase
         $section = new Section();
 
         // when
-        $col = $section->configParser()->getColumn('writtenBy');
+        $col = $section->configParser->getColumn('writtenBy');
 
         // then
         $this->assertNotNull($col);

@@ -21,7 +21,7 @@ class ConfigParserTest extends TestBase
         $person = new PersonForConfigParser();
 
         // when
-        $tableName = $person->configParser()->getTableName();
+        $tableName = $person->configParser->getTableName();
 
         // then
         $this->assertEquals('Person', $tableName);
@@ -35,7 +35,7 @@ class ConfigParserTest extends TestBase
         $person = new PersonForConfigParser();
 
         // when
-        $configParams = $person->configParser()->getConstructorParams();
+        $configParams = $person->configParser->getConstructorParams();
         $expected = array('id');
         // then
 
@@ -50,7 +50,7 @@ class ConfigParserTest extends TestBase
         $person = new PersonForConfigParser();
 
         // when
-        $className = $person->configParser()->externalClassNameFor('city');
+        $className = $person->configParser->externalClassNameFor('city');
 
         // then
         $this->assertEquals('City', $className);
@@ -64,9 +64,9 @@ class ConfigParserTest extends TestBase
         $person = new PersonForConfigParser();
 
         // then
-        $this->assertTrue($person->configParser()->isExternalColumn('city'));
-        $this->assertFalse($person->configParser()->isExternalColumn('firstname'));
-        $this->assertFalse($person->configParser()->isExternalColumn('address'));
+        $this->assertTrue($person->configParser->isExternalColumn('city'));
+        $this->assertFalse($person->configParser->isExternalColumn('firstname'));
+        $this->assertFalse($person->configParser->isExternalColumn('address'));
     }
 
     /**
@@ -77,7 +77,7 @@ class ConfigParserTest extends TestBase
         $person = new PersonForConfigParser();
 
         // then
-        $this->assertEquals('id', $person->configParser()->getIdField());
+        $this->assertEquals('id', $person->configParser->getIdField());
     }
 
     /**
@@ -88,7 +88,7 @@ class ConfigParserTest extends TestBase
         $person = new PersonForConfigParser();
 
         // then
-        $this->assertTrue($person->configParser()->isIdAutoIncremented());
+        $this->assertTrue($person->configParser->isIdAutoIncremented());
     }
 
     /**
@@ -99,7 +99,7 @@ class ConfigParserTest extends TestBase
         $person = new PersonForConfigParser();
 
         // when
-        $method = $person->configParser()->getSetMethod('city');
+        $method = $person->configParser->getSetMethod('city');
 
         // then
         $this->assertEquals('setCity', $method);
@@ -114,7 +114,7 @@ class ConfigParserTest extends TestBase
         $person = new PersonForConfigParser();
 
         // when
-        $foreignKey = $person->configParser()->foreignKeyFor('city');
+        $foreignKey = $person->configParser->foreignKeyFor('city');
 
         // then
         $this->assertEquals('zip', $foreignKey);
@@ -128,12 +128,12 @@ class ConfigParserTest extends TestBase
         $person = new PersonForConfigParser();
 
         // when
-        $col = $person->configParser()->getColumnByMethod('setLastname');
+        $col = $person->configParser->getColumnByMethod('setLastname');
 
         // then
         $this->assertEquals('lastname', $col);
         // when
-        $col = $person->configParser()->getColumnByMethod('setAreaCode');
+        $col = $person->configParser->getColumnByMethod('setAreaCode');
 
         // then
         $this->assertEquals('area_code', $col);
@@ -142,7 +142,7 @@ class ConfigParserTest extends TestBase
         $game = new TestGame();
 
         // when
-        $col = $game->configParser()->getColumnByMethod('setDatabaseId');
+        $col = $game->configParser->getColumnByMethod('setDatabaseId');
 
         // then
         $this->assertEquals('databaseId', $col);
@@ -156,7 +156,7 @@ class ConfigParserTest extends TestBase
         $game = new TestGame();
 
         // when
-        $col = $game->configParser()->getColumnByMethod('setDatabaseId');
+        $col = $game->configParser->getColumnByMethod('setDatabaseId');
 
         // then
         $this->assertEquals('databaseId', $col);
@@ -165,7 +165,7 @@ class ConfigParserTest extends TestBase
         $game = new TestGame();
 
         // when
-        $col = $game->configParser()->getColumnByMethod('setDatabaseId');
+        $col = $game->configParser->getColumnByMethod('setDatabaseId');
 
         // then
         $this->assertEquals('databaseId', $col);
@@ -180,7 +180,7 @@ class ConfigParserTest extends TestBase
         $person = new PersonForConfigParser();
 
         // when
-        $access = $person->configParser()->canWriteTo('address');
+        $access = $person->configParser->canWriteTo('address');
 
         // then
         $this->assertTrue($access);
@@ -194,12 +194,12 @@ class ConfigParserTest extends TestBase
         $person = new PersonForConfigParser();
 
         // when
-        $access = $person->configParser()->canReadFrom('address');
+        $access = $person->configParser->canReadFrom('address');
 
         // then
         $this->assertFalse($access);
         // when
-        $access = $person->configParser()->canReadFrom('area_code');
+        $access = $person->configParser->canReadFrom('area_code');
 
         // then
         $this->assertTrue($access);
@@ -215,7 +215,7 @@ class ConfigParserTest extends TestBase
         $person = new PersonForConfigParser();
 
         // when
-        $access = $person->configParser()->canReadFrom('id');
+        $access = $person->configParser->canReadFrom('id');
 
         // then
         $this->assertTrue($access);
@@ -229,11 +229,11 @@ class ConfigParserTest extends TestBase
         $manager = new Manager();
 
         // when
-        $columns = $manager->configParser()->getColumns();
+        $columns = $manager->configParser->getColumns();
         // then
         $this->assertTrue(isset($columns['address']));
         $this->assertEquals('varchar(10)', $columns['zip']);
-        $this->assertEquals("Manager", $manager->configParser()->getTableName());
+        $this->assertEquals("Manager", $manager->configParser->getTableName());
 
     }
 

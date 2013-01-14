@@ -14,7 +14,7 @@ class LudoDBCollectionConfigParser extends LudoDBConfigParser
     public function getTableName()
     {
         $model = $this->getModel();
-        if(isset($model))return $model->configParser()->getTableName();
+        if(isset($model))return $model->configParser->getTableName();
         return null;
     }
 

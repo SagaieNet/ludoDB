@@ -27,7 +27,7 @@ class LudoDBConfigParser
         $this->config = $this->getValidConfig($obj->getConfig());
         $parent = $this->getExtends();
         if (isset($parent)) {
-            $this->config = $this->getMergedConfigs($parent->configParser()->getConfig(), $this->config);
+            $this->config = $this->getMergedConfigs($parent->configParser->getConfig(), $this->config);
         }
         $this->mapColumnAliases();
     }

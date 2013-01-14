@@ -29,13 +29,13 @@ abstract class LudoDBTable extends LudoDBObject
         $data = $this->db->one($this->sqlHandler()->getSql());
         if (isset($data)) {
             $this->populateWith($data);
-            $this->setId($this->getValue($this->configParser()->getIdField()));
+            $this->setId($this->getValue($this->configParser->getIdField()));
         }
     }
 
     protected function getValidQueryParams($params)
     {
-        $paramNames = $this->configParser()->getConstructorParams();
+        $paramNames = $this->configParser->getConstructorParams();
         for($i=0,$count = count($params);$i<$count;$i++){
             $params[$i] = $this->getValidQueryParam($paramNames[$i], $params[$i]);
         }
@@ -63,7 +63,7 @@ abstract class LudoDBTable extends LudoDBObject
 
     protected function getValue($column)
     {
-        if ($this->configParser()->isExternalColumn($column)) {
+        if ($this->configParser->isExternalColumn($column)) {
             return $this->getExternalValue($column);
         }
         if (isset($this->updates) && isset($this->updates[$column])) {
@@ -74,7 +74,7 @@ abstract class LudoDBTable extends LudoDBObject
 
     private function getExternalValue($column)
     {
-        $method = $this->configParser()->getGetMethod($column);
+        $method = $this->configParser->getGetMethod($column);
         return $this->getExternalClassFor($column)->$method();
     }
 
@@ -85,8 +85,8 @@ abstract class LudoDBTable extends LudoDBObject
     private function getExternalClassFor($column)
     {
         if (!isset($this->externalClasses[$column])) {
-            $class = $this->configParser()->externalClassNameFor($column);
-            $fk = $this->configParser()->foreignKeyFor($column);
+            $class = $this->configParser->externalClassNameFor($column);
+            $fk = $this->configParser->foreignKeyFor($column);
             if (isset($fk)){
                 $val = $this->getValue($fk);
             }  else {
@@ -100,20 +100,20 @@ abstract class LudoDBTable extends LudoDBObject
 
     protected function setValue($column, $value)
     {
-        if ($this->configParser()->isExternalColumn($column)) {
+        if ($this->configParser->isExternalColumn($column)) {
             $this->setExternalValue($column, $value);
         } else {
             $value = $this->db->escapeString($value);
             if (!isset($value)) $value = LudoSQL::DELETED;
             if (!isset($this->updates)) $this->updates = array();
-            $this->updates[$this->configParser()->getInternalColName($column)] = $value;
+            $this->updates[$this->configParser->getInternalColName($column)] = $value;
         }
         return null;
     }
 
     private function setExternalValue($column, $value)
     {
-        $method = $this->configParser()->getSetMethod($column);
+        $method = $this->configParser->getSetMethod($column);
         if (isset($method)) {
             $this->getExternalClassFor($column)->$method($value);
         }
@@ -122,7 +122,7 @@ abstract class LudoDBTable extends LudoDBObject
     public function commit()
     {
         if (!isset($this->updates)) {
-            if ($this->getId() || !$this->configParser()->isIdAutoIncremented()) {
+            if ($this->getId() || !$this->configParser->isIdAutoIncremented()) {
                 return null;
             }
         }
@@ -195,7 +195,7 @@ abstract class LudoDBTable extends LudoDBObject
     protected function setId($id)
     {
         $this->id = $id;
-        $this->data[$this->configParser()->getIdField()] = $id;
+        $this->data[$this->configParser->getIdField()] = $id;
         $this->externalClasses = array();
     }
 
@@ -221,7 +221,7 @@ abstract class LudoDBTable extends LudoDBObject
      */
     public function exists()
     {
-        return $this->db->tableExists($this->configParser()->getTableName());
+        return $this->db->tableExists($this->configParser->getTableName());
     }
 
     /**
@@ -231,32 +231,32 @@ abstract class LudoDBTable extends LudoDBObject
     public function drop()
     {
         if ($this->exists()) {
-            $this->db->query("drop table " . $this->configParser()->getTableName());
+            $this->db->query("drop table " . $this->configParser->getTableName());
         }
     }
 
     public function deleteTableData()
     {
-        $this->db->query("delete from " . $this->configParser()->getTableName());
+        $this->db->query("delete from " . $this->configParser->getTableName());
     }
 
     private function createIndexes()
     {
-        $indexes = $this->configParser()->getIndexes();
+        $indexes = $this->configParser->getIndexes();
         if (!isset($indexes)) return;
         foreach ($indexes as $index) {
-            $this->db->query("create index " . $this->getIndexName($index) . " on " . $this->configParser()->getTableName() . "(" . $index . ")");
+            $this->db->query("create index " . $this->getIndexName($index) . " on " . $this->configParser->getTableName() . "(" . $index . ")");
         }
     }
 
     private function getIndexName($field)
     {
-        return 'IND_' . md5($this->configParser()->getTableName() . $field);
+        return 'IND_' . md5($this->configParser->getTableName() . $field);
     }
 
     private function insertDefaultData()
     {
-        $data = $this->configParser()->getDefaultData();
+        $data = $this->configParser->getDefaultData();
         if (!isset($data)) return;
         foreach ($data as $row) {
             $cl = $this->getNewInstance();
@@ -289,10 +289,10 @@ abstract class LudoDBTable extends LudoDBObject
 
     protected function getValues()
     {
-        $columns = $this->configParser()->getColumns();
+        $columns = $this->configParser->getColumns();
         $ret = array();
         foreach ($columns as $column => $def) {
-            $colName = $this->configParser()->getPublicColumnName($column);
+            $colName = $this->configParser->getPublicColumnName($column);
             $ret[$colName] = $this->getValue($column);
         }
         return array_merge($ret, $this->getJoinColumns());
@@ -329,14 +329,14 @@ abstract class LudoDBTable extends LudoDBObject
 
     public function __call($name, $arguments){
         if(substr($name,0,3) === 'set'){
-            $col = $this->configParser()->getColumnByMethod($name);
-            if(isset($col) && $this->configParser()->canWriteTo($col)){
+            $col = $this->configParser->getColumnByMethod($name);
+            if(isset($col) && $this->configParser->canWriteTo($col)){
                 return $this->setValue($col, $arguments[0]);
             }
         }
         if(substr($name,0,3) === 'get'){
-            $col = $this->configParser()->getColumnByMethod($name);
-            if(isset($col) && $this->configParser()->canReadFrom($col)){
+            $col = $this->configParser->getColumnByMethod($name);
+            if(isset($col) && $this->configParser->canReadFrom($col)){
                 return $this->getValue($col);
             }
 
@@ -348,7 +348,7 @@ abstract class LudoDBTable extends LudoDBObject
     private $whereEqualsArray = null;
 
     public function where($column){
-        if($this->configParser()->canBePopulatedBy($column)){
+        if($this->configParser->canBePopulatedBy($column)){
             $this->createWhereEqualsArray();
             $this->whereEqualsArray['where'][] = $column;
         }
@@ -381,7 +381,7 @@ abstract class LudoDBTable extends LudoDBObject
      * @return LudoDBTable
      */
     public function create(){
-        $this->configParser()->setConstructorParams($this->whereEqualsArray['where']);
+        $this->configParser->setConstructorParams($this->whereEqualsArray['where']);
         $this->constructorValues = $this->whereEqualsArray['equals'];
         $this->populate();
         $this->whereEqualsArray = null;
@@ -391,7 +391,7 @@ abstract class LudoDBTable extends LudoDBObject
     public function setValues($data){
         $valuesSet = false;
         foreach($data as $column=>$value){
-            if($this->configParser()->canWriteTo($column)){
+            if($this->configParser->canWriteTo($column)){
                 $this->setValue($column, $value);
                 $valuesSet = true;
             }

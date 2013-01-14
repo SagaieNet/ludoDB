@@ -17,7 +17,7 @@ class LudoSQL
 
     public function __construct(LudoDBObject $obj){
         $this->obj = $obj;
-        $this->configParser = $obj->configParser();
+        $this->configParser = $obj->configParser;
         $this->config = $obj->getConfig();
         $this->constructorValues = $obj->getConstructorValues();
         $this->validate();
@@ -123,10 +123,10 @@ class LudoSQL
     }
 
     public function getInsertSQL(){
-        $table = $this->obj->configParser()->getTableName();
+        $table = $this->obj->configParser->getTableName();
         $data = $this->obj->getUncommitted();
         if (!isset($data)) $data = array(
-            $this->obj->configParser()->getIdField() => self::DELETED
+            $this->obj->configParser->getIdField() => self::DELETED
         );
 
         $sql = "insert into " . $table."(" . implode(",", array_keys($data)) . ")";
@@ -137,7 +137,7 @@ class LudoSQL
     }
 
     public function getUpdateSql(){
-        return "update " . $this->obj->configParser()->getTableName() . " set " . $this->getUpdatesForSql($this->obj->getUncommitted()) . " where " . $this->obj->configParser()->getIdField() . " = '" . $this->obj->getId() . "'";
+        return "update " . $this->obj->configParser->getTableName() . " set " . $this->getUpdatesForSql($this->obj->getUncommitted()) . " where " . $this->obj->configParser->getIdField() . " = '" . $this->obj->getId() . "'";
 
     }
 
